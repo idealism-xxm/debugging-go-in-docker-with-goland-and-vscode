@@ -1,0 +1,12 @@
+FROM debugging-go-in-docker-base:debug
+
+WORKDIR /go/release
+COPY . .
+
+# 进行编译
+RUN mkdir bin
+RUN CGO_ENABLED=0 GOOS=linux go build -v -o bin debugging-go-in-docker/...
+
+WORKDIR /github.com/idealism-xxm/debugging-go-in-docker
+# 将编译后的文件拷贝至工作目录
+RUN cp -r /go/release/bin/* /github.com/idealism-xxm/debugging-go-in-docker

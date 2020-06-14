@@ -1,0 +1,14 @@
+FROM golang:1.14.4
+
+# 构建 dlv 调试工具
+RUN go get github.com/go-delve/delve/cmd/dlv
+
+# 先在 debug 的基础镜像中编译一下项目文件，
+# 使得改完代码再次编译时能使用当前编译的依赖缓存，加快 debug 镜像的编译
+# 若更改了 go.mod 文件，最好重新编译 debug 基础镜像
+WORKDIR /github.com/idealism-xxm
+COPY . .
+RUN mkdir bin
+RUN CGO_ENABLED=0 GOOS=linux go build -v -o bin debugging-go-in-docker/...
+# 删除对应的文件，方便后续实际编译应用程序
+RUN rm -rf /github.com/idealism-xxm

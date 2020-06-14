@@ -1,0 +1,20 @@
+version: '3'
+services:
+  debugging-go-in-docker:
+    build:
+      dockerfile: Dockerfile.debug
+      context: .
+    image: debugging-go-in-docker:debug
+    environment:
+      - MODE=debug
+    ports:
+      # 这个端口用于远程调试使用，如果程序还需要其他端口，写在后面即可
+      - "2345:2345"
+    security_opt:
+      # 要在没有安全配置文件的情况下运行容器
+      - apparmor=unconfined
+    cap_add:
+      # dlv 调试需要
+      - SYS_PTRACE
+    # dlv 调试运行的命令
+    command: ["/go/bin/dlv", "--listen=:2345", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/github.com/idealism-xxm/debugging-go-in-docker/debugging-go-in-docker"]
